@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Bus Booking</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#f4f4f4;
+}
+
+header{
+background:#d84e55;
+color:white;
+padding:18px;
+text-align:center;
+font-size:28px;
+font-weight:bold;
+}
+
+.search{
+width:90%;
+max-width:900px;
+margin:20px auto;
+display:flex;
+gap:10px;
+background:white;
+padding:20px;
+border-radius:10px;
+box-shadow:0 0 10px #ccc;
+}
+
+.search input,
+.search button{
+flex:1;
+padding:12px;
+font-size:16px;
+border:1px solid #ccc;
+border-radius:5px;
+}
+
+.search button{
+background:#d84e55;
+color:white;
+border:none;
+cursor:pointer;
+}
+
+.card{
+display:none;
+width:90%;
+max-width:900px;
+margin:auto;
+background:white;
+padding:20px;
+border-radius:10px;
+box-shadow:0 0 10px #ccc;
+}
+
+.top{
+display:flex;
+justify-content:space-between;
+margin-bottom:20px;
+}
+
+.seats{
+display:block;
+margin:20px auto;
+}
+
+.row{
+display:flex;
+justify-content:center;
+align-items:center;
+gap:10px;
+margin-bottom:12px;
+}
+
+.gap{
+width:40px;
+}
+
+.seat{
+width:50px;
+height:50px;
+background:#ddd;
+display:flex;
+justify-content:center;
+align-items:center;
+border-radius:5px;
+cursor:pointer;
+}
+.selected{
+background:green;
+color:white;
+}
+
+.booked{
+background:red;
+color:white;
+cursor:not-allowed;
+}
+
+.info input{
+width:100%;
+padding:10px;
+margin:8px 0;
+}
+
+.bookBtn{
+width:100%;
+padding:12px;
+background:#d84e55;
+color:white;
+border:none;
+font-size:18px;
+cursor:pointer;
+border-radius:5px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+🚌 RedBus Booking
+</header>
+
+<div class="search">
+
+<label for="from">From</label>
+<input type="text" id="from" placeholder="From">
+
+<label for="to">To</label>
+<input type="text" id="to" placeholder="To">
+
+<label for="date">Journey Date</label>
+<input type="date" id="date">
+
+<button onclick="showBus()">
+
+Search Bus
+</button>
+
+</div>
+
+<div class="card" id="card">
+
+<div class="top">
+
+<div>
+
+<h2 id="busName">Express Bus</h2>
+
+<p id="route"></p>
+
+</div>
+
+<h2>₹500</h2>
+
+</div>
+
+<div class="seats" id="seatBox"></div>
+
+<h3>Seats :
+<span id="count">0</span>
+</h3>
+
+<h3>Total :
+₹<span id="total">0</span>
+</h3>
+
+<div class="info">
+
+<label for="name">Passenger Name</label>
+<input type="text" id="name" placeholder="Passenger Name">
+
+<label for="mobile">Mobile Number</label>
+<input type="text" id="mobile" placeholder="Mobile Number">
+
+<button class="bookBtn" onclick="bookSeat()">
+Book Now
+</button>
+
+</div>
+
+</div>
+
+<script>
+
+/* PASTE PART 2 HERE */
+const card=document.getElementById("card");
+const seatBox=document.getElementById("seatBox");
+const count=document.getElementById("count");
+const total=document.getElementById("total");
+const busName=document.getElementById("busName");
+const route=document.getElementById("route");
+
+const price=500;
+
+function showBus(){
+
+    let from=document.getElementById("from").value.trim();
+    let to=document.getElementById("to").value.trim();
+    let date=document.getElementById("date").value;
+
+    if(from=="" || to=="" || date==""){
+        alert("Please fill all fields");
+        return;
+    }
+
+    busName.innerHTML="Express Bus";
+    route.innerHTML=from+" → "+to+"<br>Date : "+date;
+
+    card.style.display="block";
+}
+
+let num=1;
+
+for(let r=1;r<=5;r++){
+
+    let row=document.createElement("div");
+    row.className="row";
+
+    for(let c=1;c<=4;c++){
+
+        let seat=document.createElement("div");
+        seat.className="seat";
+        seat.innerHTML=num;
+
+        if([4,8,12,17].includes(num))
+            seat.classList.add("booked");
+
+        seat.onclick=function(){
+
+            if(seat.classList.contains("booked")) return;
+
+            seat.classList.toggle("selected");
+
+            let s=document.querySelectorAll(".selected").length;
+
+            count.innerHTML=s;
+            total.innerHTML=s*price;
+        };
+
+        row.appendChild(seat);
+
+        if(c==2){
+            let gap=document.createElement("div");
+            gap.className="gap";
+            row.appendChild(gap);
+        }
+
+        num++;
+    }
+
+    seatBox.appendChild(row);
+}
+
+function bookSeat(){
+
+    let name=document.querySelector(".info input").value;
+    let mobile=document.querySelectorAll(".info input")[1].value;
+
+    let selected=document.querySelectorAll(".selected");
+
+    if(selected.length==0){
+        alert("Please select at least one seat.");
+        return;
+    }
+
+    if(name=="" || mobile==""){
+        alert("Enter passenger details.");
+        return;
+    }
+
+    selected.forEach(function(seat){
+        seat.classList.remove("selected");
+        seat.classList.add("booked");
+    });
+
+    alert(
+        "Booking Successful!\n\n"+
+        "Passenger : "+name+
+        "\nSeats : "+selected.length+
+        "\nTotal : ₹"+selected.length*price
+    );
+
+    count.innerHTML=0;
+    total.innerHTML=0;
+
+    document.querySelector(".info input").value="";
+    document.querySelectorAll(".info input")[1].value="";
+
+}
+
+</script>
+
+</body>
+</html>
